@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Password Manager - Start</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <link rel="stylesheet" href="./index.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <main>
+            <h1 class="main-text">Ваш менеджер паролей</h1>
+            <br />
+            <h1 class="main-text-big">CodeGuard</h1>
+        </main>
+    </body>
+
+    <script>
+        // Ждем завершения всех анимаций (3.5 секунды)
+        setTimeout(function () {
+            // Добавляем анимацию исчезновения перед переходом
+            document.querySelector("main").style.animation =
+                "fadeOut 0.5s ease forwards";
+
+            // Ждем завершения анимации исчезновения и переходим
+            setTimeout(function () {
+                window.location.href = "./main.html";
+            }, 500); // 0.5 секунды на fadeOut
+        }, 3500); // 3.5 секунды общее время (2.5 анимации + 1 задержка)
+    </script>
+</html>
