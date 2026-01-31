@@ -17,6 +17,38 @@
         />
     </head>
     <body>
+        <!-- Добавь после <body> и перед <main>
+        <div class="orientation-warning">
+            <i class="fas fa-rotate"></i>
+            <p>Пожалуйста, поверните устройство</p>
+            <small
+                >Для лучшего отображения используйте альбомную ориентацию</small
+            >
+        </div>
+
+        <div class="loader" id="loader">
+            <div class="loader-spinner"></div>
+            <div class="loader-text">Загрузка...</div>
+        </div>
+
+        <div class="mobile-header">
+            <button class="mobile-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h2>CodeGuard</h2>
+            <button class="mobile-toggle" id="addToggle">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+
+        <div class="mobile-tabs">
+            <button class="tab-button active" data-tab="passwords">
+                <i class="fas fa-lock"></i> Пароли
+            </button>
+            <button class="tab-button" data-tab="add">
+                <i class="fas fa-plus"></i> Добавить
+            </button>
+        </div> -->
         <main>
             <div class="glass-win">
                 <!-- Левая часть: Список паролей -->
@@ -25,18 +57,32 @@
                     <div class="search-container">
                         <div class="search-box">
                             <i class="fas fa-search"></i>
-                            <input type="text" placeholder="Поиск паролей..." />
+                            <input
+                                type="text"
+                                id="searchInput"
+                                placeholder="Поиск паролей..."
+                            />
                         </div>
                     </div>
 
-                    <div class="passwords-list"></div>
+                    <div class="passwords-list" id="passwordsList">
+                        <!-- Пароли будут загружаться здесь -->
+                        <div class="empty-state">
+                            <i class="fas fa-lock-open"></i>
+                            <p>У вас пока нет сохраненных паролей</p>
+                            <small
+                                >Добавьте первый пароль с помощью формы
+                                справа</small
+                            >
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Правая часть: Добавить пароль -->
                 <div class="add-password">
                     <h1><i class="fas fa-plus-circle"></i> Добавить пароль</h1>
 
-                    <form class="password-form">
+                    <form class="password-form" id="passwordForm">
                         <div class="form-group">
                             <label for="site">
                                 <i class="fas fa-globe"></i> Сайт
@@ -68,16 +114,33 @@
                             <div class="password-input-group">
                                 <input
                                     type="password"
-                                    id="password"
+                                    id="passwordInput"
                                     placeholder="Введите пароль"
                                     required
                                 />
-                                <button type="button" class="show-password">
+                                <button
+                                    type="button"
+                                    class="show-password"
+                                    id="showPasswordBtn"
+                                >
                                     <i class="far fa-eye"></i>
                                 </button>
-                                <button type="button" class="generate-password">
+                                <button
+                                    type="button"
+                                    class="generate-password"
+                                    id="generatePasswordBtn"
+                                >
                                     <i class="fas fa-bolt"></i>
                                 </button>
+                            </div>
+                            <div class="password-strength">
+                                <div
+                                    class="strength-bar"
+                                    id="strengthBar"
+                                ></div>
+                            </div>
+                            <div class="strength-text" id="strengthText">
+                                Введите пароль
                             </div>
                         </div>
 
@@ -95,102 +158,22 @@
                             <button type="submit" class="btn-save">
                                 <i class="fas fa-save"></i> Сохранить пароль
                             </button>
-                            <button type="button" class="btn-cancel">
-                                <i class="fas fa-times"></i> Отмена
+                            <button
+                                type="button"
+                                class="btn-cancel"
+                                id="cancelBtn"
+                            >
+                                <i class="fas fa-times"></i> Очистить
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
         </main>
-        <script src="./js/auth.js"></script>
-        <script src="./js/passwordManager.js"></script>
+
+        <!-- Подключаем наши скрипты -->
+        <script src="./js/storage.js"></script>
         <script src="./js/utils.js"></script>
-
-        <script>
-            // Инициализация
-            const pm = new PasswordManager();
-
-            // Проверка авторизации
-            if (isFirstTime()) {
-                // Показываем окно установки мастер-пароля
-                window.location.href = "./setup.html";
-            }
-
-            // Загрузка паролей при загрузке страницы
-            document.addEventListener("DOMContentLoaded", async () => {
-                const passwords = await pm.getAllPasswords();
-                renderPasswords(passwords);
-
-                // Обработка формы
-                document
-                    .getElementById("passwordForm")
-                    .addEventListener("submit", async (e) => {
-                        e.preventDefault();
-
-                        const website =
-                            document.getElementById("website").value;
-                        const username =
-                            document.getElementById("username").value;
-                        const password =
-                            document.getElementById("password").value;
-                        const notes = document.getElementById("notes").value;
-
-                        await pm.addPassword(
-                            website,
-                            username,
-                            password,
-                            notes,
-                        );
-
-                        // Очистка формы и обновление списка
-                        e.target.reset();
-                        const updatedPasswords = await pm.getAllPasswords();
-                        renderPasswords(updatedPasswords);
-                    });
-
-                // Генератор пароля
-                document
-                    .getElementById("generateBtn")
-                    .addEventListener("click", () => {
-                        const password = generatePassword(16);
-                        document.getElementById("password").value = password;
-                    });
-            });
-
-            function renderPasswords(passwords) {
-                const container = document.getElementById("passwordsList");
-                container.innerHTML = "";
-
-                if (passwords.length === 0) {
-                    container.innerHTML =
-                        '<div class="empty-state">Нет паролей</div>';
-                    return;
-                }
-
-                passwords.forEach((p) => {
-                    const div = document.createElement("div");
-                    div.className = "password-item";
-                    div.innerHTML = `
-            <div class="password-icon">${p.website[0].toUpperCase()}</div>
-            <div class="password-info">
-                <h3>${p.website}</h3>
-                <p>${p.username}</p>
-                <small>${formatDate(p.createdAt)}</small>
-            </div>
-            <button class="copy-btn" onclick="copyPassword('${p.password}')">
-                <i class="fas fa-copy"></i>
-            </button>
-        `;
-                    container.appendChild(div);
-                });
-            }
-
-            async function copyPassword(password) {
-                if (await copyToClipboard(password)) {
-                    alert("Пароль скопирован в буфер обмена!");
-                }
-            }
-        </script>
+        <script src="./js/main.js"></script>
     </body>
 </html>

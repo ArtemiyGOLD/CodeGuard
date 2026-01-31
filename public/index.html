@@ -15,6 +15,16 @@
             href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
             rel="stylesheet"
         />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover"
+        />
+        <meta name="theme-color" content="#004645" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent"
+        />
     </head>
     <body>
         <main>
@@ -23,7 +33,28 @@
             <h1 class="main-text-big">CodeGuard</h1>
         </main>
     </body>
+    <script src="./js/mobile.js"></script>
+    <script>
+        // Определяем тип устройства
+        const isMobile =
+            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+                navigator.userAgent,
+            );
+        const isTablet = /iPad|Android(?!.*Mobile)|Tablet/i.test(
+            navigator.userAgent,
+        );
 
+        // Добавляем классы устройств
+        if (isMobile) document.documentElement.classList.add("mobile-device");
+        if (isTablet) document.documentElement.classList.add("tablet-device");
+        if ("ontouchstart" in window)
+            document.documentElement.classList.add("touch-device");
+
+        // Предотвращаем масштабирование на iOS при фокусе
+        document.addEventListener("touchstart", function () {}, {
+            passive: true,
+        });
+    </script>
     <script>
         // Ждем завершения всех анимаций (3.5 секунды)
         setTimeout(function () {
