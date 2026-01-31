@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>CodeGuard - Менеджер паролей</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <link rel="stylesheet" href="./css/main.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <main>
+            <div class="glass-win">
+                <!-- Левая часть: Список паролей -->
+                <div class="passwords">
+                    <h1><i class="fas fa-lock"></i> Ваши пароли</h1>
+                    <div class="search-container">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Поиск паролей..." />
+                        </div>
+                    </div>
+
+                    <div class="passwords-list"></div>
+                </div>
+
+                <!-- Правая часть: Добавить пароль -->
+                <div class="add-password">
+                    <h1><i class="fas fa-plus-circle"></i> Добавить пароль</h1>
+
+                    <form class="password-form">
+                        <div class="form-group">
+                            <label for="site">
+                                <i class="fas fa-globe"></i> Сайт
+                            </label>
+                            <input
+                                type="text"
+                                id="site"
+                                placeholder="example.com"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="login">
+                                <i class="fas fa-user"></i> Логин / Email
+                            </label>
+                            <input
+                                type="text"
+                                id="login"
+                                placeholder="user@example.com"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">
+                                <i class="fas fa-key"></i> Пароль
+                            </label>
+                            <div class="password-input-group">
+                                <input
+                                    type="password"
+                                    id="password"
+                                    placeholder="Введите пароль"
+                                    required
+                                />
+                                <button type="button" class="show-password">
+                                    <i class="far fa-eye"></i>
+                                </button>
+                                <button type="button" class="generate-password">
+                                    <i class="fas fa-bolt"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="notes">
+                                <i class="far fa-sticky-note"></i> Заметки
+                            </label>
+                            <textarea
+                                id="notes"
+                                placeholder="Дополнительная информация..."
+                            ></textarea>
+                        </div>
+
+                        <div class="form-buttons">
+                            <button type="submit" class="btn-save">
+                                <i class="fas fa-save"></i> Сохранить пароль
+                            </button>
+                            <button type="button" class="btn-cancel">
+                                <i class="fas fa-times"></i> Отмена
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+        <script src="./js/auth.js"></script>
+        <script src="./js/passwordManager.js"></script>
+        <script src="./js/utils.js"></script>
+
+        <script>
+            // Инициализация
+            const pm = new PasswordManager();
+
+            // Проверка авторизации
+            if (isFirstTime()) {
+                // Показываем окно установки мастер-пароля
+                window.location.href = "./setup.html";
+            }
+
+            // Загрузка паролей при загрузке страницы
+            document.addEventListener("DOMContentLoaded", async () => {
+                const passwords = await pm.getAllPasswords();
+                renderPasswords(passwords);
+
+                // Обработка формы
+                document
+                    .getElementById("passwordForm")
+                    .addEventListener("submit", async (e) => {
+                        e.preventDefault();
+
+                        const website =
+                            document.getElementById("website").value;
+                        const username =
+                            document.getElementById("username").value;
+                        const password =
+                            document.getElementById("password").value;
+                        const notes = document.getElementById("notes").value;
+
+                        await pm.addPassword(
+                            website,
+                            username,
+                            password,
+                            notes,
+                        );
+
+                        // Очистка формы и обновление списка
+                        e.target.reset();
+                        const updatedPasswords = await pm.getAllPasswords();
+                        renderPasswords(updatedPasswords);
+                    });
+
+                // Генератор пароля
+                document
+                    .getElementById("generateBtn")
+                    .addEventListener("click", () => {
+                        const password = generatePassword(16);
+                        document.getElementById("password").value = password;
+                    });
+            });
+
+            function renderPasswords(passwords) {
+                const container = document.getElementById("passwordsList");
+                container.innerHTML = "";
+
+                if (passwords.length === 0) {
+                    container.innerHTML =
+                        '<div class="empty-state">Нет паролей</div>';
+                    return;
+                }
+
+                passwords.forEach((p) => {
+                    const div = document.createElement("div");
+                    div.className = "password-item";
+                    div.innerHTML = `
+            <div class="password-icon">${p.website[0].toUpperCase()}</div>
+            <div class="password-info">
+                <h3>${p.website}</h3>
+                <p>${p.username}</p>
+                <small>${formatDate(p.createdAt)}</small>
+            </div>
+            <button class="copy-btn" onclick="copyPassword('${p.password}')">
+                <i class="fas fa-copy"></i>
+            </button>
+        `;
+                    container.appendChild(div);
+                });
+            }
+
+            async function copyPassword(password) {
+                if (await copyToClipboard(password)) {
+                    alert("Пароль скопирован в буфер обмена!");
+                }
+            }
+        </script>
+    </body>
+</html>

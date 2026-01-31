@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>CodeGuard - Настройка</title>
+        <link rel="stylesheet" href="./css/main.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            .setup-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                padding: 20px;
+                text-align: center;
+            }
+
+            .setup-box {
+                background: rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(15px);
+                border-radius: 20px;
+                padding: 40px;
+                width: 100%;
+                max-width: 500px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+            }
+
+            .setup-box h1 {
+                color: #ffffff;
+                margin-bottom: 30px;
+                font-size: 32px;
+            }
+
+            .setup-box h1 i {
+                color: #00bfa5;
+                margin-right: 10px;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+                text-align: left;
+            }
+
+            .form-group label {
+                display: block;
+                color: #b2dfdb;
+                margin-bottom: 8px;
+                font-size: 16px;
+            }
+
+            .form-group input {
+                width: 100%;
+                padding: 15px;
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 12px;
+                color: #ffffff;
+                font-size: 16px;
+                outline: none;
+                transition: all 0.3s;
+            }
+
+            .form-group input:focus {
+                border-color: rgba(0, 191, 165, 0.5);
+            }
+
+            .btn-setup {
+                width: 100%;
+                padding: 16px;
+                background: #00bfa5;
+                color: #004645;
+                border: none;
+                border-radius: 12px;
+                font-size: 18px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+                margin-top: 20px;
+            }
+
+            .btn-setup:hover {
+                background: #00e5ff;
+                transform: translateY(-2px);
+            }
+
+            .password-strength {
+                margin-top: 10px;
+                height: 6px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 3px;
+                overflow: hidden;
+            }
+
+            .strength-bar {
+                height: 100%;
+                width: 0%;
+                transition:
+                    width 0.3s,
+                    background-color 0.3s;
+            }
+
+            .strength-text {
+                font-size: 14px;
+                color: #b2dfdb;
+                margin-top: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <div class="setup-container">
+                <div class="setup-box">
+                    <h1>
+                        <i class="fas fa-shield-alt"></i> Настройка CodeGuard
+                    </h1>
+                    <p style="color: #b2dfdb; margin-bottom: 30px">
+                        Установите мастер-пароль для защиты ваших данных. Этот
+                        пароль нельзя будет восстановить!
+                    </p>
+
+                    <form id="setupForm">
+                        <div class="form-group">
+                            <label for="masterPassword">
+                                <i class="fas fa-key"></i> Мастер-пароль
+                            </label>
+                            <input
+                                type="password"
+                                id="masterPassword"
+                                placeholder="Введите мастер-пароль"
+                                required
+                                minlength="8"
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirmPassword">
+                                <i class="fas fa-key"></i> Подтвердите пароль
+                            </label>
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                placeholder="Повторите мастер-пароль"
+                                required
+                                minlength="8"
+                            />
+                        </div>
+
+                        <div class="password-strength">
+                            <div class="strength-bar" id="strengthBar"></div>
+                        </div>
+                        <div class="strength-text" id="strengthText"></div>
+
+                        <button type="submit" class="btn-setup">
+                            <i class="fas fa-lock"></i> Создать хранилище
+                        </button>
+                    </form>
+
+                    <p
+                        style="
+                            color: rgba(255, 255, 255, 0.5);
+                            margin-top: 20px;
+                            font-size: 14px;
+                        "
+                    >
+                        <i class="fas fa-info-circle"></i>
+                        Все данные шифруются локально в вашем браузере.
+                    </p>
+                </div>
+            </div>
+        </main>
+
+        <script>
+            // Проверка силы пароля
+            const masterPasswordInput =
+                document.getElementById("masterPassword");
+            const confirmPasswordInput =
+                document.getElementById("confirmPassword");
+            const strengthBar = document.getElementById("strengthBar");
+            const strengthText = document.getElementById("strengthText");
+
+            masterPasswordInput.addEventListener("input", function () {
+                const password = this.value;
+                const strength = checkPasswordStrength(password);
+
+                strengthBar.style.width = strength.score * 20 + "%";
+                strengthBar.style.backgroundColor = strength.color;
+                strengthText.textContent = strength.text;
+                strengthText.style.color = strength.color;
+            });
+
+            // Обработка формы
+            document
+                .getElementById("setupForm")
+                .addEventListener("submit", async function (e) {
+                    e.preventDefault();
+
+                    const password = masterPasswordInput.value;
+                    const confirmPassword = confirmPasswordInput.value;
+
+                    if (password !== confirmPassword) {
+                        alert("Пароли не совпадают!");
+                        return;
+                    }
+
+                    if (password.length < 8) {
+                        alert("Пароль должен содержать минимум 8 символов");
+                        return;
+                    }
+
+                    try {
+                        // Показываем индикатор загрузки
+                        const submitBtn = e.target.querySelector(
+                            'button[type="submit"]',
+                        );
+                        const originalText = submitBtn.innerHTML;
+                        submitBtn.innerHTML =
+                            '<i class="fas fa-spinner fa-spin"></i> Создание хранилища...';
+                        submitBtn.disabled = true;
+
+                        // 1. Генерируем соль
+                        const salt = crypto.getRandomValues(new Uint8Array(16));
+
+                        // 2. Создаем ключ из пароля (упрощенная версия)
+                        const encoder = new TextEncoder();
+                        const passwordBuffer = encoder.encode(password);
+                        const saltBuffer = encoder.encode(
+                            "codeguard-salt-" + Array.from(salt).join(""),
+                        );
+
+                        // 3. Имитируем хэширование (в реальности используй PBKDF2)
+                        let combined = new Uint8Array(
+                            passwordBuffer.length + saltBuffer.length,
+                        );
+                        combined.set(passwordBuffer);
+                        combined.set(saltBuffer, passwordBuffer.length);
+
+                        const hashBuffer = await crypto.subtle.digest(
+                            "SHA-256",
+                            combined,
+                        );
+                        const hashArray = Array.from(
+                            new Uint8Array(hashBuffer),
+                        );
+                        const hashHex = hashArray
+                            .map((b) => b.toString(16).padStart(2, "0"))
+                            .join("");
+
+                        // 4. Сохраняем в localStorage
+                        localStorage.setItem("masterPasswordHash", hashHex);
+                        localStorage.setItem(
+                            "masterPasswordSalt",
+                            Array.from(salt).join(","),
+                        );
+                        localStorage.setItem("masterPasswordSet", "true");
+                        localStorage.setItem("appInitialized", "true");
+
+                        // 5. Создаем пустое хранилище паролей
+                        localStorage.setItem(
+                            "encryptedPasswords",
+                            JSON.stringify([]),
+                        );
+
+                        // 6. Добавляем задержку для UX
+                        setTimeout(() => {
+                            // 7. Переходим на главную страницу
+                            window.location.href = "./main.html";
+                        }, 1000);
+                    } catch (error) {
+                        console.error("Ошибка:", error);
+                        alert(
+                            "Ошибка при создании хранилища. Попробуйте еще раз.",
+                        );
+
+                        // Восстанавливаем кнопку
+                        const submitBtn = e.target.querySelector(
+                            'button[type="submit"]',
+                        );
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }
+                });
+
+            // Простая функция проверки пароля
+            function checkPasswordStrength(password) {
+                let score = 0;
+
+                if (password.length >= 8) score += 1;
+                if (password.length >= 12) score += 1;
+                if (/[a-z]/.test(password)) score += 1;
+                if (/[A-Z]/.test(password)) score += 1;
+                if (/[0-9]/.test(password)) score += 1;
+                if (/[^A-Za-z0-9]/.test(password)) score += 1;
+
+                if (score >= 6)
+                    return {
+                        score: 5,
+                        text: "Очень сильный",
+                        color: "#00BFA5",
+                    };
+                if (score >= 5)
+                    return { score: 4, text: "Сильный", color: "#4CAF50" };
+                if (score >= 4)
+                    return { score: 3, text: "Средний", color: "#FF9800" };
+                if (score >= 2)
+                    return { score: 2, text: "Слабый", color: "#FF5722" };
+                return { score: 1, text: "Очень слабый", color: "#F44336" };
+            }
+        </script>
+    </body>
+</html>

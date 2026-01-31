@@ -1,0 +1,18 @@
+{
+    "rewrites": [
+        { "source": "/", "destination": "/public/index.html" },
+        { "source": "/setup", "destination": "/public/setup.html" },
+        { "source": "/main", "destination": "/public/main.html" }
+    ],
+    "headers": [
+        {
+            "source": "/public/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=3600"
+                }
+            ]
+        }
+    ]
+}
