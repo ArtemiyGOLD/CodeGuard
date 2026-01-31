@@ -12,14 +12,16 @@ main {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .main-text {
     color: #ffffff;
     font-family: Inter;
-    font-size: 100px;
     font-weight: 1000;
-
+    text-align: center;
+    
     opacity: 0;
     transform: perspective(500px) translateZ(100px) rotateX(10deg);
     filter: blur(5px);
@@ -30,14 +32,80 @@ main {
 .main-text-big {
     color: #ffffff;
     font-family: Inter;
-    font-size: 120px;
     font-weight: 1000;
-
+    text-align: center;
+    
     opacity: 0;
     transform: perspective(500px) translateZ(100px) rotateX(10deg);
     filter: blur(5px);
     
     animation: textReveal 1.5s cubic-bezier(0.215, 0.610, 0.355, 1) forwards;
+}
+
+/* Адаптивные размеры текста */
+@media screen and (min-width: 1200px) {
+    .main-text {
+        font-size: 100px;
+    }
+    .main-text-big {
+        font-size: 120px;
+    }
+}
+
+@media screen and (max-width: 1199px) and (min-width: 768px) {
+    .main-text {
+        font-size: 70px;
+    }
+    .main-text-big {
+        font-size: 90px;
+    }
+}
+
+@media screen and (max-width: 767px) and (min-width: 480px) {
+    .main-text {
+        font-size: 50px;
+    }
+    .main-text-big {
+        font-size: 65px;
+    }
+}
+
+@media screen and (max-width: 479px) {
+    .main-text {
+        font-size: 40px;
+        line-height: 1.2;
+    }
+    .main-text-big {
+        font-size: 50px;
+        line-height: 1.2;
+    }
+    
+    br {
+        display: none; /* Убираем <br> на мобилках */
+    }
+    
+    main {
+        gap: 20px; /* Вместо <br> используем gap */
+    }
+}
+
+/* Для горизонтальной ориентации телефона */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .main-text {
+        font-size: 40px;
+    }
+    .main-text-big {
+        font-size: 50px;
+    }
+    
+    main {
+        flex-direction: row;
+        gap: 30px;
+    }
+    
+    br {
+        display: none;
+    }
 }
 
 @keyframes textReveal {
@@ -84,17 +152,5 @@ body::before {
     to {
         opacity: 0;
         transform: translateY(-30px);
-    }
-}
-
-/* Анимация появления для main.html */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
     }
 }
